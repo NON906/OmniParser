@@ -19,16 +19,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import easyocr
 from paddleocr import PaddleOCR
-reader = easyocr.Reader(['en', 'ja'])
-paddle_ocr = PaddleOCR(
-    lang=os.environ['OCR_LANG'] if 'OCR_LANG' in os.environ else 'japan', #'en',  # other lang also available
-    use_angle_cls=False,
-    use_gpu=False,  # using cuda will conflict with pytorch in the same process
-    show_log=False,
-    max_batch_size=1024,
-    use_dilation=True,  # improves accuracy
-    det_db_score_mode='slow',  # improves accuracy
-    rec_batch_num=1024)
 import time
 import base64
 
@@ -42,6 +32,24 @@ from torchvision.transforms import ToPILImage
 import supervision as sv
 import torchvision.transforms as T
 from util.box_annotator import BoxAnnotator 
+
+
+reader = None
+paddle_ocr = None
+def model_init(use_paddleocr):
+    global reader, paddle_ocr
+    if reader is None and not use_paddleocr:
+        reader = easyocr.Reader(['en', 'ja'])
+    if paddle_ocr is None and use_paddleocr:
+        paddle_ocr = PaddleOCR(
+            lang=os.environ['OCR_LANG'] if 'OCR_LANG' in os.environ else 'japan', #'en',  # other lang also available
+            use_angle_cls=False,
+            use_gpu=False,  # using cuda will conflict with pytorch in the same process
+            show_log=False,
+            max_batch_size=1024,
+            use_dilation=True,  # improves accuracy
+            det_db_score_mode='slow',  # improves accuracy
+            rec_batch_num=1024)
 
 
 def get_caption_model_processor(model_name, model_name_or_path="Salesforce/blip2-opt-2.7b", device=None):
@@ -502,6 +510,7 @@ def get_xywh_yolo(input):
     return x, y, w, h
 
 def check_ocr_box(image_source: Union[str, Image.Image], display_img = True, output_bb_format='xywh', goal_filtering=None, easyocr_args=None, use_paddleocr=False):
+    model_init(use_paddleocr)
     if isinstance(image_source, str):
         image_source = Image.open(image_source)
     if image_source.mode == 'RGBA':
