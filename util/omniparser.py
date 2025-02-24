@@ -4,6 +4,7 @@ from PIL import Image
 import io
 import base64
 from typing import Dict
+import sys
 class Omniparser(object):
     def __init__(self, config: Dict):
         self.config = config
@@ -11,7 +12,7 @@ class Omniparser(object):
 
         self.som_model = get_yolo_model(model_path=config['som_model_path'])
         self.caption_model_processor = get_caption_model_processor(model_name=config['caption_model_name'], model_name_or_path=config['caption_model_path'], device=device)
-        print('Omniparser initialized!!!')
+        print('Omniparser initialized!!!', file=sys.stderr)
 
     def parse(self, image_base64: str):
         image_bytes = base64.b64decode(image_base64)
