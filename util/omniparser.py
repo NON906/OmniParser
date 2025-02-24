@@ -16,6 +16,10 @@ class Omniparser(object):
     def parse(self, image_base64: str):
         image_bytes = base64.b64decode(image_base64)
         image = Image.open(io.BytesIO(image_bytes))
+
+        return self.parse_raw(image)
+
+    def parse_raw(self, image: Image):
         print('image size:', image.size)
         
         box_overlay_ratio = max(image.size) / 3200
@@ -30,3 +34,4 @@ class Omniparser(object):
         dino_labled_img, label_coordinates, parsed_content_list = get_som_labeled_img(image, self.som_model, BOX_TRESHOLD = self.config['BOX_TRESHOLD'], output_coord_in_ratio=True, ocr_bbox=ocr_bbox,draw_bbox_config=draw_bbox_config, caption_model_processor=self.caption_model_processor, ocr_text=text,use_local_semantics=True, iou_threshold=0.7, scale_img=False, batch_size=128)
 
         return dino_labled_img, parsed_content_list
+        

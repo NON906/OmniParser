@@ -21,7 +21,7 @@ import easyocr
 from paddleocr import PaddleOCR
 reader = easyocr.Reader(['en', 'ja'])
 paddle_ocr = PaddleOCR(
-    lang='japan', #'en',  # other lang also available
+    lang=os.environ['OCR_LANG'] if 'OCR_LANG' in os.environ else 'japan', #'en',  # other lang also available
     use_angle_cls=False,
     use_gpu=False,  # using cuda will conflict with pytorch in the same process
     show_log=False,
